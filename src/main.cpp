@@ -37,11 +37,14 @@ int main(int argc, char* argv[])
         // Process events
         while (SDL_PollEvent(&event))
         {
+
+            std::cout << event.type << "\n";
+
             if (event.type == SDL_EVENT_QUIT)
                 running = false;
 
             if (event.type == SDL_EVENT_KEY_DOWN)
-                if (event.key.key = SDLK_ESCAPE)
+                if (event.key.key == SDLK_ESCAPE)
                     running = false;
         }
     }
