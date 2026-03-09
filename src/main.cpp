@@ -5,56 +5,45 @@
 int main(int argc, char* argv[])
 {
     // Initialize SDL
-    if (!SDL_Init(SDL_INIT_VIDEO))
-    {
+    if (!SDL_Init(SDL_INIT_VIDEO)){
         std::cerr << "SDL failed to initialize: " << SDL_GetError() << "\n";
         return -1;
     }
 
     // Create a window
     SDL_Window* window = SDL_CreateWindow("My Engine", 1280, 720, SDL_WINDOW_RESIZABLE);
-
-    if (!window)
-    {
+    if (!window){
         std::cerr << "Failed to create window: " << SDL_GetError() << "\n";
         SDL_Quit();
         return -1;
     }
 
-    std::cout << "Window created successfully, creating renderer\n";
+    // std::cout << "Window created successfully, creating renderer\n";
     
     // Create Renderer
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
-    
-    if (!renderer)
-    {
+    if (!renderer){
         std::cerr << "Failed to create renderer: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
 
-    std::cout << "Renderer created successfully, entering event loop\n";
+    // std::cout << "Renderer created successfully, entering event loop\n";
 
-
-    // Basic event loop - keeps window open
     bool running = true;
-    SDL_Event event;
-
+    SDL_Event event; // queue of events (inputs)
     float rectangle_x = 0;
     float rectangle_y = 0;
     float rectangle_width = 100;
     float rectangle_height = 200;
-    float speed = 100.0f; // pixels per second
-    float move;
+    const float speed = 300.0f; // pixels per second
     int current_time = SDL_GetTicks();
     int previous_time = SDL_GetTicks();
 
-    while (running)
-    {
-        // Process events
-        while (SDL_PollEvent(&event))
-        {
+    while (running){
+        // Process queue of events until no more
+        while (SDL_PollEvent(&event)){
             if (event.type == SDL_EVENT_QUIT)
                 running = false;
 
@@ -66,27 +55,36 @@ int main(int argc, char* argv[])
         }
 
         current_time = SDL_GetTicks();
-        float delta = current_time - previous_time;
-        float delta_seconds = delta / 1000.0f;
-        move = delta_seconds * speed;
+        float delta = current_time - previous_time;  //delta is difference between last update in ms
+        float delta_seconds = delta / 1000.0f; // divide delta  to get amount in 
+        float move = delta_seconds * speed;
         previous_time = current_time;
 
-        const bool* keystate = SDL_GetKeyboardState(NULL);
         // Movement of rectangle
-        if (keystate[SDL_SCANCODE_UP])
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        const bool* keystate = SDL_GetKeyboardState(NULL);
+        if (keystate[SDL_SCANCODE_UP]){
             rectangle_y -= move;
-            // if (rectangle_y <= 0)
-            //   rectangle_y = 0;
-        if (keystate[SDL_SCANCODE_DOWN])
+            if (rectangle_y <= 0)
+              rectangle_y = 0;
+        }
+        if (keystate[SDL_SCANCODE_DOWN]){
             rectangle_y += move;
-        if (keystate[SDL_SCANCODE_LEFT])
+            if (rectangle_y >= (h - rectangle_height))
+              rectangle_y = (h - rectangle_height);
+        }
+        if (keystate[SDL_SCANCODE_LEFT]){
             rectangle_x -= move;
-        if (keystate[SDL_SCANCODE_RIGHT])
+            if (rectangle_x <= 0)
+              rectangle_x = 0;
+        }
+        if (keystate[SDL_SCANCODE_RIGHT]){
             rectangle_x += move;
-
-
-
-        // Choose rectangle starting and shape
+            if (rectangle_x >= (w - rectangle_width))
+              rectangle_x = (w - rectangle_width);
+        }
+        // Create Rectangle Object
         SDL_FRect rect;
         rect.x = rectangle_x;
         rect.y = rectangle_y;
