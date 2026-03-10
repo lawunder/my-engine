@@ -2,6 +2,7 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
+#include <cmath>
 
 
 
@@ -80,7 +81,7 @@ int main(int argc, char* argv[])
 
 
     float paddle_width = 25;
-    float paddle_height = 150;
+    float paddle_height = 300;
     float paddle_speed = 400;
     Paddle left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
     Paddle right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
@@ -160,8 +161,11 @@ int main(int argc, char* argv[])
 
         if (start_game){
             //ball movement and collisions
-            ball.x += (delta_seconds * ball.speed) * ball.x_velo;
-            ball.y += (delta_seconds * ball.speed) * ball.y_velo;
+            float xmove = (delta_seconds * ball.speed) * ball.x_velo;
+            float ymove = (delta_seconds * ball.speed) * ball.y_velo;
+            float move_norm = std::pow(ball.x_velo, 2) + std::pow(ball.y_velo, 2);
+            ball.x += (xmove / move_norm);
+            ball.y += (ymove / move_norm);
             if (ball.y <= 0){
                 ball.y_velo *= -1;
             }
