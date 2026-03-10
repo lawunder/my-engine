@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     float ball_size = 20;
     srand(SDL_GetTicks()); // set random seed
     float ball_x_velo;
-    if (SDL_GetTicks() % 2 == 0){
+    if (rand() % 2 == 0){
         ball_x_velo = 1;
     }
     else{
@@ -159,10 +159,10 @@ int main(int argc, char* argv[])
             ball.x = window_width/2.0f;
             ball.y = window_height/2.0f;
             if (SDL_GetTicks() % 2 == 0){
-                ball_x_velo = 1;
+                ball.x_velo = 1;
             }
             else{
-                ball_x_velo = -1;
+                ball.x_velo = -1;
             }
             ball.y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
             score = false;
