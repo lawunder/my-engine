@@ -14,6 +14,22 @@ struct Ball {
 };
 
 
+void RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, float x, float y){
+    //Takes in text and renders it to screen at location
+    SDL_Color font_color = {255, 255, 255, 255};
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text, 0, font_color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_DestroySurface(surface);
+    SDL_FRect rect_text;
+    rect_text.x = x;
+    rect_text.y = y;
+    rect_text.w = 0; // handled by get texture size
+    rect_text.h = 0; // handled by get texture size
+    SDL_GetTextureSize(texture, &rect_text.w, &rect_text.h);
+    SDL_RenderTexture(renderer, texture, NULL, &rect_text);
+    SDL_DestroyTexture(texture);
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -56,7 +72,7 @@ int main(int argc, char* argv[])
         SDL_Quit();
         return -1;
     }
-    
+
     bool running = true;
     SDL_Event event; // queue of events (inputs)
     int current_time = SDL_GetTicks();
@@ -153,24 +169,29 @@ int main(int argc, char* argv[])
                 ball.y_velo *= -1;
             }
 
-
+            // Ball enters left scoring zone
             if (ball.x <= left_paddle.w){
                 if (ball.y >= left_paddle.y && ball.y <= left_paddle.h + left_paddle.y){
                     ball.x_velo *= -1;
+                    ball.speed *= 1.15;
                 }
                 if (ball.x <= 0){
                     right_score += 1;
                     score = true;
+                    ball.speed = ball_speed;
                 }
             }
 
+            // Ball enters right scoring zone
             if (ball.x >= window_width - right_paddle.w - ball.w){
                 if (ball.y >= right_paddle.y && ball.y <= right_paddle.h + right_paddle.y){
                     ball.x_velo *= -1;
+                    ball.speed *= 1.25;
                 }
                 if (ball.x >= window_width){
                     left_score += 1;
                     score = true;
+                    ball.speed = ball_speed;
                 }
             }
         }
@@ -188,7 +209,7 @@ int main(int argc, char* argv[])
             score = false;
             start_game = false;
         }
-
+        
 
         // Create Paddle Objects
         SDL_FRect left_paddle_rect;
@@ -209,87 +230,33 @@ int main(int argc, char* argv[])
         ball_rect.w = ball.w;
         ball_rect.h = ball.h;
 
-        // Handles drawing
-        SDL_SetRenderDrawColor(renderer, 1, 1, 1, 255);
+        SDL_SetRenderDrawColor(renderer, 1, 1, 1, 255); // background
         SDL_RenderClear(renderer);
-
-        SDL_SetRenderDrawColor(renderer, 123, 123, 123, 255);
+        SDL_SetRenderDrawColor(renderer, 123, 123, 123, 255); // paddle color
         SDL_RenderFillRect(renderer, &left_paddle_rect);
-
-        SDL_SetRenderDrawColor(renderer, 123, 123, 123, 255);
         SDL_RenderFillRect(renderer, &right_paddle_rect);
-
-        SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255); // ball color
         SDL_RenderFillRect(renderer, &ball_rect);
 
-
-        SDL_Color font_color = {255, 255, 255, 255};
-
-        std::string left_score_str = std::to_string(left_score);
-        const char* left_score_char = left_score_str.c_str();
-        SDL_Surface* surface_left = TTF_RenderText_Blended(font, left_score_char, 0, font_color);
-        SDL_Texture* texture_left = SDL_CreateTextureFromSurface(renderer, surface_left);
-        SDL_DestroySurface(surface_left);
-        SDL_FRect rect_text_left;
-        rect_text_left.x = 10;
-        rect_text_left.y = 10;
-        rect_text_left.w = 0; // handled by get texture size
-        rect_text_left.h = 0; // handled by get texture size
-        SDL_GetTextureSize(texture_left, &rect_text_left.w, &rect_text_left.h);
-        SDL_RenderTexture(renderer, texture_left, NULL, &rect_text_left);
-        SDL_DestroyTexture(texture_left);
-
-        std::string right_score_str = std::to_string(right_score);
-        const char* right_score_char = right_score_str.c_str();
-        SDL_Surface* surface_right = TTF_RenderText_Blended(font, right_score_char, 0, font_color);
-        SDL_Texture* texture_right = SDL_CreateTextureFromSurface(renderer, surface_right);
-        SDL_DestroySurface(surface_right);
-        SDL_FRect rect_text_right;
-        rect_text_right.x = window_width - 20;
-        rect_text_right.y = 10;
-        rect_text_right.w = 0; // handled by get texture size
-        rect_text_right.h = 0; // handled by get texture size
-        SDL_GetTextureSize(texture_right, &rect_text_right.w, &rect_text_right.h);
-        SDL_RenderTexture(renderer, texture_right, NULL, &rect_text_right);
-        SDL_DestroyTexture(texture_right);
-
-
+        // Render all text for scoring and win conditions
+        const char* left_score_text = std::to_string(left_score).c_str();
+        RenderText(renderer, font, left_score_text, 10, 10);
+        const char* right_score_text = std::to_string(right_score).c_str();
+        RenderText(renderer, font, right_score_text, window_width - 20, 10);
         if (left_score == 5){
-            const char* left_win_char = "LEFT WINS!";
-            SDL_Surface* surface_left_win = TTF_RenderText_Blended(font, left_win_char, 0, font_color);
-            SDL_Texture* texture_left_win = SDL_CreateTextureFromSurface(renderer, surface_left_win);
-            SDL_DestroySurface(surface_left_win);
-            SDL_FRect rect_text_left_win;
-            rect_text_left_win.x = window_width / 2.0f;
-            rect_text_left_win.y = window_height / 2.0f;
-            rect_text_left_win.w = 0; // handled by get texture size
-            rect_text_left_win.h = 0; // handled by get texture size
-            SDL_GetTextureSize(texture_left_win, &rect_text_left_win.w, &rect_text_left_win.h);
-            SDL_RenderTexture(renderer, texture_left_win, NULL, &rect_text_left_win);
-            SDL_DestroyTexture(texture_left_win);
-
+            const char* left_win_text = "LEFT WINS!";
+            RenderText(renderer, font, left_win_text, window_width / 2.0f, window_height / 2.0f);
         }
         if (right_score == 5){
-            const char* right_win_char = "RIGHT WINS!";
-            SDL_Surface* surface_right_win = TTF_RenderText_Blended(font, right_win_char, 0, font_color);
-            SDL_Texture* texture_right_win = SDL_CreateTextureFromSurface(renderer, surface_right_win);
-            SDL_DestroySurface(surface_right_win);
-            SDL_FRect rect_text_right_win;
-            rect_text_right_win.x = window_width / 2.0f;
-            rect_text_right_win.y = window_height / 2.0f;
-            rect_text_right_win.w = 0; // handled by get texture size
-            rect_text_right_win.h = 0; // handled by get texture size
-            SDL_GetTextureSize(texture_right_win, &rect_text_right_win.w, &rect_text_right_win.h);
-            SDL_RenderTexture(renderer, texture_right_win, NULL, &rect_text_right_win);
-            SDL_DestroyTexture(texture_right_win);
+            const char* right_win_text = "RIGHT WINS!";
+            RenderText(renderer, font, right_win_text, window_width / 2.0f, window_height / 2.0f);
         }
-
-        SDL_RenderPresent(renderer);
-
-        // SDL_Delay(32); // roughly 30fps
+        SDL_RenderPresent(renderer); // Send drawing to Screen
+        
+        // SDL_Delay(32); // delay by 32ms, roughly 30fps
     }
 
-    // Cleanup
+    // Cleanup all opened objects
     TTF_CloseFont(font);
     TTF_Quit();
     SDL_DestroyRenderer(renderer);
