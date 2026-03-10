@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
 
 
@@ -16,6 +17,8 @@ struct Ball {
 
 int main(int argc, char* argv[])
 {
+    std::cout << "Starting...\n"; 
+
     // Initialize SDL
     if (!SDL_Init(SDL_INIT_VIDEO)){
         std::cerr << "SDL failed to initialize: " << SDL_GetError() << "\n";
@@ -37,6 +40,12 @@ int main(int argc, char* argv[])
     if (!renderer){
         std::cerr << "Failed to create renderer: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    if (!TTF_Init()){
+        std::cerr << "SDL_ttf failed to initialize: " << SDL_GetError() << "\n";
         SDL_Quit();
         return -1;
     }
@@ -210,6 +219,7 @@ int main(int argc, char* argv[])
     // Cleanup
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
