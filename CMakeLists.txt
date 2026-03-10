@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find SDL3
 find_package(SDL3 REQUIRED)
 
+
 # Explicitly list source files instead of GLOB
 add_executable(MyEngine
     src/main.cpp

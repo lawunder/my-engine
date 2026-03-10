@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
     float paddle_width = 25;
     float paddle_height = 150;
-    float paddle_speed = 300;
+    float paddle_speed = 400;
     Paddle left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
     Paddle right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
 
