@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
     }
 
     // Create a window
-    int window_width = 1280;
-    int window_height = 720;
+    float window_width = 1280;
+    float window_height = 720;
     SDL_Window* window = SDL_CreateWindow("My Engine", window_width, window_height, SDL_WINDOW_RESIZABLE);
     if (!window){
         std::cerr << "Failed to create window: " << SDL_GetError() << "\n";
@@ -47,13 +47,13 @@ int main(int argc, char* argv[])
     int previous_time = SDL_GetTicks();
 
 
-    int paddle_width = 25;
-    int paddle_height = 300;
+    float paddle_width = 25;
+    float paddle_height = 150;
     float paddle_speed = 300;
-    Paddle left_paddle = {0, ((window_height/2) - (paddle_height/2)), paddle_width, paddle_height, paddle_speed};
-    Paddle right_paddle = {window_width - paddle_width, ((window_height/2) - (paddle_height/2)), paddle_width, paddle_height, paddle_speed};
+    Paddle left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
+    Paddle right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
 
-    int ball_size = 20;
+    float ball_size = 20;
     srand(SDL_GetTicks()); // set random seed
     float ball_x_velo;
     if (SDL_GetTicks() % 2 == 0){
@@ -63,10 +63,11 @@ int main(int argc, char* argv[])
         ball_x_velo = -1;
     }
     float ball_y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-    float ball_speed = 1000;
-    Ball ball = {window_width/2, window_height/2, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed};
+    float ball_speed = 600;
+    Ball ball = {window_width/2.0f, window_height/2.0f, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed};
 
     bool score = false;
+    bool start_game = false;
 
     while (running){
         // Process queue of events until no more
@@ -81,6 +82,8 @@ int main(int argc, char* argv[])
             }
         }
 
+
+
         // Handle Delta Time
         current_time = SDL_GetTicks();
         float delta = current_time - previous_time;  //delta is difference between last update in ms
@@ -91,6 +94,10 @@ int main(int argc, char* argv[])
         int window_width, window_height;
         SDL_GetWindowSize(window, &window_width, &window_height);
         const bool* keystate = SDL_GetKeyboardState(NULL);
+
+        if (keystate[SDL_SCANCODE_SPACE]){
+            start_game = true;
+        }
 
         // left paddle movement
         if (keystate[SDL_SCANCODE_W]){
@@ -117,39 +124,40 @@ int main(int argc, char* argv[])
               right_paddle.y = (window_height - right_paddle.h);
         }
 
-
-        //ball movement and collisions
-        ball.x += (delta_seconds * ball.speed) * ball.x_velo;
-        ball.y += (delta_seconds * ball.speed) * ball.y_velo;
-        if (ball.y <= 0){
-            ball.y_velo *= -1;
-        }
-        if (ball.y >= (window_height - ball.h)){
-            ball.y_velo *= -1;
-        }
-
-
-        if (ball.x <= left_paddle.w){
-            if (ball.y >= left_paddle.y && ball.y <= left_paddle.h + left_paddle.y){
-                ball.x_velo *= -1;
+        if (start_game){
+            //ball movement and collisions
+            ball.x += (delta_seconds * ball.speed) * ball.x_velo;
+            ball.y += (delta_seconds * ball.speed) * ball.y_velo;
+            if (ball.y <= 0){
+                ball.y_velo *= -1;
             }
-            if (ball.x <= 0){
-                score = true;
+            if (ball.y >= (window_height - ball.h)){
+                ball.y_velo *= -1;
             }
-        }
 
-        if (ball.x >= window_width - right_paddle.w - ball.w){
-            if (ball.y >= right_paddle.y && ball.y <= right_paddle.h + right_paddle.y){
-                ball.x_velo *= -1;
+
+            if (ball.x <= left_paddle.w){
+                if (ball.y >= left_paddle.y && ball.y <= left_paddle.h + left_paddle.y){
+                    ball.x_velo *= -1;
+                }
+                if (ball.x <= 0){
+                    score = true;
+                }
             }
-            if (ball.x >= window_width){
-                score = true;
+
+            if (ball.x >= window_width - right_paddle.w - ball.w){
+                if (ball.y >= right_paddle.y && ball.y <= right_paddle.h + right_paddle.y){
+                    ball.x_velo *= -1;
+                }
+                if (ball.x >= window_width){
+                    score = true;
+                }
             }
         }
 
         if (score){
-            ball.x = window_width/2;
-            ball.y = window_height/2;
+            ball.x = window_width/2.0f;
+            ball.y = window_height/2.0f;
             if (SDL_GetTicks() % 2 == 0){
                 ball_x_velo = 1;
             }
@@ -158,6 +166,7 @@ int main(int argc, char* argv[])
             }
             ball.y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
             score = false;
+            start_game = false;
         }
 
 
