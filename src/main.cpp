@@ -5,7 +5,6 @@
 #include <cmath>
 
 
-
 struct Paddle {
     float x, y, w, h, speed;
 };
@@ -61,33 +60,46 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    // Create Font Loader
     if (!TTF_Init()){
         std::cerr << "SDL_ttf failed to initialize: " << SDL_GetError() << "\n";
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
 
+    // Load Font
     TTF_Font* font = TTF_OpenFont("./assets/fonts/Roboto-VariableFont_wdth,wght.ttf", 30.0f);
     if (!font){
         std::cerr << "Font failed to load: " << SDL_GetError() << "\n";
+        TTF_Quit();
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
 
+    // Vars
+    srand(SDL_GetTicks()); // set random seed
     bool running = true;
     SDL_Event event; // queue of events (inputs)
     int current_time = SDL_GetTicks();
     int previous_time = SDL_GetTicks();
+    bool score = false;
+    int left_score = 0;
+    int right_score = 0;
+    bool start_game = false;
 
-
+    // PADDLES init
     float paddle_width = 25;
     float paddle_height = 300;
     float paddle_speed = 400;
     Paddle left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
     Paddle right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
 
+    // BALL init
     float ball_size = 20;
-    srand(SDL_GetTicks()); // set random seed
     float ball_x_velo;
     if (rand() % 2 == 0){
         ball_x_velo = 1;
@@ -99,11 +111,7 @@ int main(int argc, char* argv[])
     float ball_speed = 600;
     Ball ball = {window_width/2.0f, window_height/2.0f, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed};
 
-    bool score = false;
-    int left_score = 0;
-    int right_score = 0;
-    bool start_game = false;
-
+    // LOOP
     while (running){
         // Process queue of events until no more
         while (SDL_PollEvent(&event)){
@@ -118,18 +126,18 @@ int main(int argc, char* argv[])
         }
 
 
-
         // Handle Delta Time
         current_time = SDL_GetTicks();
         float delta = current_time - previous_time;  //delta is difference between last update in ms
         float delta_seconds = delta / 1000.0f; // divide delta  to get amount in 
         previous_time = current_time;
 
-        // Initialize window sizes and input
+        // Initialize window sizes
         int window_width, window_height;
         SDL_GetWindowSize(window, &window_width, &window_height);
-        const bool* keystate = SDL_GetKeyboardState(NULL);
 
+        // Input
+        const bool* keystate = SDL_GetKeyboardState(NULL);
         if (keystate[SDL_SCANCODE_SPACE]){
             start_game = true;
         }
@@ -140,7 +148,6 @@ int main(int argc, char* argv[])
             if (left_paddle.y <= 0)
               left_paddle.y = 0;
         }
-        
         if (keystate[SDL_SCANCODE_S]){
             left_paddle.y += (delta_seconds * left_paddle.speed);
             if (left_paddle.y >= (window_height - left_paddle.h))
@@ -163,9 +170,11 @@ int main(int argc, char* argv[])
             //ball movement and collisions
             float xmove = (delta_seconds * ball.speed) * ball.x_velo;
             float ymove = (delta_seconds * ball.speed) * ball.y_velo;
-            float move_norm = std::pow(ball.x_velo, 2) + std::pow(ball.y_velo, 2);
+            float move_norm = std::pow(ball.x_velo, 2) + std::pow(ball.y_velo, 2); // Normalize velo vector
             ball.x += (xmove / move_norm);
             ball.y += (ymove / move_norm);
+
+            // flip y_velo on floor/ceiling
             if (ball.y <= 0){
                 ball.y_velo *= -1;
             }
@@ -200,6 +209,7 @@ int main(int argc, char* argv[])
             }
         }
 
+        // Reset Ball on score
         if (score){
             ball.x = window_width/2.0f;
             ball.y = window_height/2.0f;
@@ -234,6 +244,7 @@ int main(int argc, char* argv[])
         ball_rect.w = ball.w;
         ball_rect.h = ball.h;
 
+        // DRAW
         SDL_SetRenderDrawColor(renderer, 1, 1, 1, 255); // background
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 123, 123, 123, 255); // paddle color
@@ -255,7 +266,8 @@ int main(int argc, char* argv[])
             const char* right_win_text = "RIGHT WINS!";
             RenderText(renderer, font, right_win_text, window_width / 2.0f, window_height / 2.0f);
         }
-        SDL_RenderPresent(renderer); // Send drawing to Screen
+        // RENDER
+        SDL_RenderPresent(renderer);
         
         // SDL_Delay(32); // delay by 32ms, roughly 30fps
     }
