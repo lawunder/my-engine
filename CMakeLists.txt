@@ -13,6 +13,7 @@ find_package(SDL3_ttf REQUIRED)
 # Explicitly list source files instead of GLOB
 add_executable(MyEngine
     src/main.cpp
+    src/game.cpp
 )
 
 # Include directories
