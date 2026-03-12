@@ -1,6 +1,8 @@
 build/
 bin/
 out/
+package/
+*.zip
 *.o
 *.obj
 *.exe
