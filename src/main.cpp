@@ -41,6 +41,13 @@ void RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, float 
     SDL_DestroyTexture(texture);
 }
 
+bool CheckCollision(Paddle& a, Ball& b){
+    // AABB collison check
+    return (a.x < b.x + b.w && 
+        a.x + a.w > b.x && 
+        a.y < b.y + b.h && 
+        a.y + a.h > b.y);
+}
 
 void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int window_height){ 
     // Process queue of events until no more
@@ -86,8 +93,7 @@ void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int wi
     }
 }
 
-
-void Update(GameState& state, float delta_seconds, int window_width, int window_height){
+void Update(GameState& state, float delta_seconds, int window_width, int window_height, float speed_increase){
     if (state.start_game){
         //ball movement and collisions
         float xmove = (delta_seconds * state.ball.speed) * state.ball.x_velo;
@@ -104,30 +110,33 @@ void Update(GameState& state, float delta_seconds, int window_width, int window_
             state.ball.y_velo *= -1;
         }
 
-        // Ball enters left scoring zone
-        if (state.ball.x <= state.left_paddle.w){
-            if (state.ball.y >= state.left_paddle.y && state.ball.y <= state.left_paddle.h + state.left_paddle.y){
-                state.ball.x_velo *= -1;
-                state.ball.speed *= 1.15;
-            }
-            if (state.ball.x <= 0){
-                state.right_score += 1;
-                state.score = true;
-                state.ball.speed = state.ball.default_speed;
-            }
+        // Ball left
+        if (CheckCollision(state.left_paddle, state.ball)){
+            state.ball.x_velo *= -1;
+            state.ball.x = state.left_paddle.x + state.left_paddle.w;
+            state.ball.speed *= speed_increase;
+        }
+        if (state.ball.x <= 0){
+            state.right_score += 1;
+            state.score = true;
+            state.ball.speed = state.ball.default_speed;
         }
 
-        // Ball enters right scoring zone
-        if (state.ball.x >= window_width - state.right_paddle.w - state.ball.w){
-            if (state.ball.y >= state.right_paddle.y && state.ball.y <= state.right_paddle.h + state.right_paddle.y){
-                state.ball.x_velo *= -1;
-                state.ball.speed *= 1.25;
-            }
-            if (state.ball.x >= window_width){
-                state.left_score += 1;
-                state.score = true;
-                state.ball.speed = state.ball.default_speed;
-            }
+        // Ball right
+        if (CheckCollision(state.right_paddle, state.ball)){
+            state.ball.x_velo *= -1;
+            state.ball.x = state.right_paddle.x - state.ball.w;
+            state.ball.speed *= speed_increase;
+        }
+        if (state.ball.x >= window_width){
+            state.left_score += 1;
+            state.score = true;                
+            state.ball.speed = state.ball.default_speed;
+        }
+        
+        // Cap speed
+        if (state.ball.speed > 1500.0f){
+            state.ball.speed = 1500.0f;
         }
     }
 
@@ -249,8 +258,8 @@ int main(int argc, char* argv[])
     // Vars
     srand(SDL_GetTicks()); // set random seed
     SDL_Event event; // queue of events (inputs)
-    int current_time = SDL_GetTicks();
-    int previous_time = SDL_GetTicks();
+    Uint64 current_time = SDL_GetTicks();
+    Uint64 previous_time = SDL_GetTicks();
 
     // PADDLES init
     float paddle_width = 25;
@@ -268,6 +277,7 @@ int main(int argc, char* argv[])
     }
     float ball_y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
     float ball_speed = 600;
+    float speed_increase = 1.10;
 
     // GAMESTATE init
     GameState state;
@@ -291,7 +301,7 @@ int main(int argc, char* argv[])
 
         SDL_GetWindowSize(window, &window_width, &window_height);
         HandleInput(state, event, delta_seconds, window_height);
-        Update(state, delta_seconds, window_width, window_height);
+        Update(state, delta_seconds, window_width, window_height, speed_increase);
         Render(state, renderer, font, window_width, window_height);
     
         // SDL_Delay(32); // delay by 32ms, roughly 30fps
