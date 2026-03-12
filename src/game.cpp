@@ -16,7 +16,7 @@ void RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, float 
     SDL_DestroyTexture(texture);
 }
 
-bool CheckCollision(Paddle& a, Ball& b){
+bool CheckCollision(const Paddle& a, const Ball& b){
     // AABB collison check
     return (a.x < b.x + b.w && 
         a.x + a.w > b.x && 
@@ -24,7 +24,7 @@ bool CheckCollision(Paddle& a, Ball& b){
         a.y + a.h > b.y);
 }
 
-void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int window_height){ 
+void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int window_width, int window_height){ 
     // Process queue of events until no more
     while (SDL_PollEvent(&event)){
         if (event.type == SDL_EVENT_QUIT){
@@ -35,6 +35,23 @@ void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int wi
                 state.running = false;
             }
         }
+        if (event.type == SDL_EVENT_WINDOW_RESIZED){
+            state.right_paddle.x = event.window.data1 - state.right_paddle.w;
+            state.left_paddle.h = event.window.data2 / 3.0f;
+            state.right_paddle.h = event.window.data2 / 3.0f;
+            state.left_paddle.y = (event.window.data2 / 2.0f) - (state.left_paddle.h / 2);
+            state.right_paddle.y = (event.window.data2 / 2.0f) - (state.right_paddle.h / 2);
+            state.left_paddle.speed = event.window.data2 / state.left_paddle.moving_time;
+            state.right_paddle.speed = event.window.data2 / state.left_paddle.moving_time;
+
+            // only reposition ball if game hasn't started
+            if (!state.start_game){
+                state.ball.x = event.window.data1/2.0f;
+                state.ball.y = event.window.data2/2.0f;
+                state.ball.default_speed = event.window.data1 / state.ball.crossing_time;
+                state.ball.speed = state.ball.default_speed;
+            }
+        }        
     }
 
     // Start Game
@@ -68,7 +85,7 @@ void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int wi
     }
 }
 
-void Update(GameState& state, float delta_seconds, int window_width, int window_height, float speed_increase){
+void Update(GameState& state, float delta_seconds, int window_width, int window_height){
     if (state.start_game){
         //ball movement and collisions
         float xmove = (delta_seconds * state.ball.speed) * state.ball.x_velo;
@@ -89,7 +106,7 @@ void Update(GameState& state, float delta_seconds, int window_width, int window_
         if (CheckCollision(state.left_paddle, state.ball)){
             state.ball.x_velo *= -1;
             state.ball.x = state.left_paddle.x + state.left_paddle.w;
-            state.ball.speed *= speed_increase;
+            state.ball.speed *= state.ball.speed_increase;
         }
         if (state.ball.x <= 0){
             state.right_score += 1;
@@ -101,7 +118,7 @@ void Update(GameState& state, float delta_seconds, int window_width, int window_
         if (CheckCollision(state.right_paddle, state.ball)){
             state.ball.x_velo *= -1;
             state.ball.x = state.right_paddle.x - state.ball.w;
-            state.ball.speed *= speed_increase;
+            state.ball.speed *= state.ball.speed_increase;
         }
         if (state.ball.x >= window_width){
             state.left_score += 1;
@@ -110,8 +127,8 @@ void Update(GameState& state, float delta_seconds, int window_width, int window_
         }
         
         // Cap speed
-        if (state.ball.speed > 1500.0f){
-            state.ball.speed = 1500.0f;
+        if (state.ball.speed > (state.ball.speed * state.ball.max_speed_mult)){
+            state.ball.speed = state.ball.speed * state.ball.max_speed_mult;
         }
     }
 

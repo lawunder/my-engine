@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     // Create a window
     int window_width = 1280;
     int window_height = 720;
-    SDL_Window* window = SDL_CreateWindow("My Engine", window_width, window_height, 0);
+    SDL_Window* window = SDL_CreateWindow("My Engine", window_width, window_height, SDL_WINDOW_RESIZABLE);
     if (!window){
         std::cerr << "Failed to create window: " << SDL_GetError() << "\n";
         SDL_Quit();
@@ -60,7 +60,8 @@ int main(int argc, char* argv[])
     // PADDLES init
     float paddle_width = 25;
     float paddle_height = 300;
-    float paddle_speed = 400;
+    float moving_time = 1.0f;
+    float paddle_speed = window_height / moving_time;
 
     // BALL init
     float ball_size = 20;
@@ -72,14 +73,16 @@ int main(int argc, char* argv[])
         ball_x_velo = -1;
     }
     float ball_y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-    float ball_speed = 600;
+    float crossing_time = 2.0f;
+    float ball_speed = window_width / crossing_time;
     float speed_increase = 1.10;
+    float max_speed_mult = 4;
 
     // GAMESTATE init
     GameState state;
-    state.ball = {window_width/2.0f, window_height/2.0f, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed, ball_speed};
-    state.left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
-    state.right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed};
+    state.ball = {window_width/2.0f, window_height/2.0f, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed, ball_speed, crossing_time, max_speed_mult, speed_increase};
+    state.left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time};
+    state.right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time};
     state.left_score = 0;
     state.right_score = 0;
     state.running = true;
@@ -96,8 +99,8 @@ int main(int argc, char* argv[])
         previous_time = current_time;
 
         SDL_GetWindowSize(window, &window_width, &window_height);
-        HandleInput(state, event, delta_seconds, window_height);
-        Update(state, delta_seconds, window_width, window_height, speed_increase);
+        HandleInput(state, event, delta_seconds, window_width, window_height);
+        Update(state, delta_seconds, window_width, window_height);
         Render(state, renderer, font, window_width, window_height);
     
         // SDL_Delay(32); // delay by 32ms, roughly 30fps

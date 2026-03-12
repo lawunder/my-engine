@@ -7,11 +7,11 @@
 
 
 struct Paddle {
-    float x, y, w, h, speed;
+    float x, y, w, h, speed, moving_time;
 };
 
 struct Ball {
-    float x, y, w, h, x_velo, y_velo, default_speed, speed;
+    float x, y, w, h, x_velo, y_velo, default_speed, speed, crossing_time, max_speed_mult, speed_increase;
 };
 
 struct GameState {
@@ -27,10 +27,10 @@ struct GameState {
 
 void RenderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, float x, float y);
 
-bool CheckCollision(Paddle& a, Ball& b);
+bool CheckCollision(const Paddle& a, const Ball& b);
 
-void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int window_height);
+void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int window_width, int window_height);
 
-void Update(GameState& state, float delta_seconds, int window_width, int window_height, float speed_increase);
+void Update(GameState& state, float delta_seconds, int window_width, int window_height);
 
 void Render(const GameState& state, SDL_Renderer* renderer, TTF_Font* font, int window_width, int window_height);
