@@ -7,7 +7,7 @@
 
 
 struct Paddle {
-    float x, y, w, h, speed, moving_time;
+    float x, y, w, h, speed, moving_time, size;
 };
 
 struct Ball {

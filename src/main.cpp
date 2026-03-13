@@ -58,13 +58,15 @@ int main(int argc, char* argv[])
     Uint64 previous_time = SDL_GetTicks();
 
     // PADDLES init
-    float paddle_width = 25;
-    float paddle_height = 300;
-    float moving_time = 1.0f;
+    float paddle_width = 30;
+    float paddle_size = 3.0f;
+    float paddle_height = window_height / paddle_size;
+    float moving_time = 1.0f; // seconds to cross screen
     float paddle_speed = window_height / moving_time;
+    
 
     // BALL init
-    float ball_size = 20;
+    float ball_size = 25.0f;
     float ball_x_velo;
     if (rand() % 2 == 0){
         ball_x_velo = 1;
@@ -73,7 +75,7 @@ int main(int argc, char* argv[])
         ball_x_velo = -1;
     }
     float ball_y_velo = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-    float crossing_time = 2.0f;
+    float crossing_time = 2.0f; // seconds to cross screen
     float ball_speed = window_width / crossing_time;
     float speed_increase = 1.10;
     float max_speed_mult = 4;
@@ -81,8 +83,8 @@ int main(int argc, char* argv[])
     // GAMESTATE init
     GameState state;
     state.ball = {window_width/2.0f, window_height/2.0f, ball_size, ball_size, ball_x_velo, ball_y_velo, ball_speed, ball_speed, crossing_time, max_speed_mult, speed_increase};
-    state.left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time};
-    state.right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time};
+    state.left_paddle = {0, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time, paddle_size};
+    state.right_paddle = {window_width - paddle_width, ((window_height/2.0f) - (paddle_height/2.0f)), paddle_width, paddle_height, paddle_speed, moving_time, paddle_size};
     state.left_score = 0;
     state.right_score = 0;
     state.running = true;

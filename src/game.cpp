@@ -37,18 +37,17 @@ void HandleInput(GameState& state, SDL_Event& event, float delta_seconds, int wi
         }
         if (event.type == SDL_EVENT_WINDOW_RESIZED){
             state.right_paddle.x = event.window.data1 - state.right_paddle.w;
-            state.left_paddle.h = event.window.data2 / 3.0f;
-            state.right_paddle.h = event.window.data2 / 3.0f;
+            state.left_paddle.h = event.window.data2 / state.right_paddle.size;
+            state.right_paddle.h = event.window.data2 / state.right_paddle.size;
             state.left_paddle.y = (event.window.data2 / 2.0f) - (state.left_paddle.h / 2);
             state.right_paddle.y = (event.window.data2 / 2.0f) - (state.right_paddle.h / 2);
             state.left_paddle.speed = event.window.data2 / state.left_paddle.moving_time;
             state.right_paddle.speed = event.window.data2 / state.left_paddle.moving_time;
-
+            state.ball.default_speed = event.window.data1 / state.ball.crossing_time;
             // only reposition ball if game hasn't started
             if (!state.start_game){
                 state.ball.x = event.window.data1/2.0f;
                 state.ball.y = event.window.data2/2.0f;
-                state.ball.default_speed = event.window.data1 / state.ball.crossing_time;
                 state.ball.speed = state.ball.default_speed;
             }
         }        
@@ -127,8 +126,8 @@ void Update(GameState& state, float delta_seconds, int window_width, int window_
         }
         
         // Cap speed
-        if (state.ball.speed > (state.ball.speed * state.ball.max_speed_mult)){
-            state.ball.speed = state.ball.speed * state.ball.max_speed_mult;
+        if (state.ball.speed > (state.ball.default_speed * state.ball.max_speed_mult)){
+            state.ball.speed = state.ball.default_speed * state.ball.max_speed_mult;
         }
     }
 
