@@ -16,8 +16,9 @@ struct World{
     Score score; 
     GameFlags game_flags; 
 
+    uint32_t next_ID = 0;
     uint32_t CreateEntity(){
-        return nextId ++;
+        return next_ID++;
     };
 
 };
