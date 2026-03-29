@@ -11,18 +11,18 @@ find_package(SDL3_ttf REQUIRED)
 
 
 # Explicitly list source files instead of GLOB
-add_executable(MyEngine
+add_executable(Pong
     src/main.cpp
     src/game.cpp
 )
 
 # Include directories
-target_include_directories(MyEngine PRIVATE 
+target_include_directories(Pong PRIVATE 
     src/
 )
 
 # Link SDL3
-target_link_libraries(MyEngine PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+target_link_libraries(Pong PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 
 foreach(DLL
     SDL3.dll
@@ -43,9 +43,9 @@ foreach(DLL
     libglib-2.0-0.dll
     libpcre2-8-0.dll
 )
-    add_custom_command(TARGET MyEngine POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_newer
+    add_custom_command(TARGET Pong POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_SOURCE_DIR}/dlls/${DLL}"
-        $<TARGET_FILE_DIR:MyEngine>
+        $<TARGET_FILE_DIR:Pong>
     )
 endforeach()

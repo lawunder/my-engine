@@ -12,10 +12,25 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 
 ## Features
 
-- **Rendering** — SDL3-based 2D rendering pipeline for drawing shapes each frame
+- **Rendering** — SDL3-based 2D rendering pipeline with double buffering for smooth frame output
 - **Collision Detection** — AABB (Axis-Aligned Bounding Box) collision detection between game objects
-- **Input Handling** — Keyboard input system for real-time player controls
-- **Game Loop** — Fixed-timestep game loop managing update and render cycles
+- **Input Handling** — Event-driven and state-based keyboard input system for real-time controls
+- **Game Loop** — Delta time game loop ensuring frame rate independent movement across all hardware
+- **Text Rendering** — SDL3_ttf integration for in-game UI and score display
+- **Window Resizing** — All game elements scale dynamically with the window size
+
+---
+
+## Pong Controls
+
+| Action | Player 1 (Left) | Player 2 (Right) |
+|---|---|---|
+| Move Up | `W` | `Up Arrow` |
+| Move Down | `S` | `Down Arrow` |
+| Serve | `Space` | `Space` |
+| Quit | `Escape` | `Escape` |
+
+First player to 5 points wins. The ball increases in speed with each paddle hit.
 
 ---
 
@@ -24,9 +39,11 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 ### Prerequisites
 
 - Windows 10 or later
-- [CMake](https://cmake.org/download/) 3.15+
-- [SDL3](https://github.com/libsdl-org/SDL/releases) development libraries
-- A [C++17](https://en.cppreference.com/w/cpp/17) compatible compiler (MSVC via Visual Studio, or MinGW-w64)
+- Install [MSYS2](https://www.msys2.org/), then open the **MSYS2 MinGW64** terminal and run:
+
+```bash
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-sdl3 mingw-w64-x86_64-sdl3-ttf
+```
 
 ### Building
 
@@ -36,24 +53,18 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
    cd my-engine
    ```
 
-2. **Configure with CMake**
+2. **Configure and build**
    ```bash
-   mkdir build
-   cd build
-   cmake ..
+   /c/msys64/mingw64/bin/cmake -B build -G Ninja
+   /c/msys64/mingw64/bin/cmake --build build
    ```
 
-3. **Build**
+3. **Run**
    ```bash
-   cmake --build .
+   ./build/Pong.exe
    ```
 
-4. **Run**
-   ```bash
-   ./Pong.exe
-   ```
-
-> **Note:** Make sure SDL3 is installed and its path is correctly set in your environment or `CMakeLists.txt` before building.
+> **Note:** All required DLLs are included in the repository and copied to the build folder automatically by CMake.
 
 ---
 
@@ -61,8 +72,13 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 
 ```
 my-engine/
-├── src/              # Engine and game source files
-├── assets/           # Font and other assets
+├── src/
+│   ├── main.cpp      # Entry point and game loop
+│   ├── game.cpp      # Engine system implementations
+│   └── game.h        # Structs and function declarations
+├── assets/
+│   └── fonts/        # Font files
+├── dlls/             # Required runtime DLL dependencies
 └── CMakeLists.txt    # Build configuration
 ```
 
@@ -73,6 +89,7 @@ my-engine/
 - Audio system (SDL3 Mixer)
 - Entity Component System (ECS) architecture
 - Cross-platform support (Mac/Linux)
+- OpenGL rendering backend
 
 ---
 
@@ -80,7 +97,9 @@ my-engine/
 
 - [C++17](https://en.cppreference.com/w/cpp/17)
 - [SDL3](https://www.libsdl.org/)
-- [CMake](https://cmake.org/)
+- [SDL3_ttf](https://wiki.libsdl.org/SDL3_ttf/FrontPage)
+- [CMake](https://cmake.org/) + [Ninja](https://ninja-build.org/)
+- [MSYS2](https://www.msys2.org/) / MinGW64
 
 ---
 
