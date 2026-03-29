@@ -20,7 +20,7 @@ struct PlayerInput{
 };
 
 struct Renderable{
-    float x, y;
+    float w, h;
     SDL_Color color;
 };
 

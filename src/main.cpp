@@ -15,6 +15,36 @@ void InitWorld(World& world, float w, float h){
         world.ball_physics[ball] = {200.0f, 0.0f, 2.0f, 4.0f, 1.15f};
 }
 
+void RenderSystem(const World& world, SDL_Renderer* renderer, TTF_Font* font, 
+    int window_width, int window_height){
+
+    SDL_SetRenderDrawColor(renderer, 1, 1, 1, 255); // background
+    SDL_RenderClear(renderer);
+
+    for (const auto& [e, r] : world.renderables){
+        if (!world.positions.count(e)){ 
+            continue;
+        }
+        const auto& pos = world.positions.at(e);
+
+        SDL_SetRenderDrawColor(renderer, r.color.r, r.color.g, r.color.b, 255);
+        SDL_FRect rect = {pos.x , pos.y, r.w, r.h};
+    }
+
+    std::string ls = std::to_string(world.score.left);
+    std::string rs = std::to_string(world.score.right);
+    RenderText(renderer, font, ls.c_str(), 10, 10);
+    RenderText(renderer, font, rs.c_str(), (float)window_width - 20, 10);
+
+    if (world.score.left == 5)
+        RenderText(renderer, font, "LEFT WINS!", window_width / 2.0f, window_height / 2.0f);
+    if (world.score.right == 5)
+        RenderText(renderer, font, "RIGHT WINS!", window_width / 2.0f, window_height / 2.0f);
+
+    SDL_RenderPresent(renderer);
+
+}
+
 
 int main(int argc, char* argv[])
 {
