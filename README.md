@@ -12,7 +12,7 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 
 ## Features
 
-- **Rendering** — SDL2-based 2D rendering pipeline for drawing sprites and shapes each frame
+- **Rendering** — SDL3-based 2D rendering pipeline for drawing shapes each frame
 - **Collision Detection** — AABB (Axis-Aligned Bounding Box) collision detection between game objects
 - **Input Handling** — Keyboard input system for real-time player controls
 - **Game Loop** — Fixed-timestep game loop managing update and render cycles
@@ -25,8 +25,8 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 
 - Windows 10 or later
 - [CMake](https://cmake.org/download/) 3.15+
-- [SDL2](https://github.com/libsdl-org/SDL/releases) development libraries
-- A C++17 compatible compiler (MSVC via Visual Studio, or MinGW-w64)
+- [SDL3](https://github.com/libsdl-org/SDL/releases) development libraries
+- A [C++17](https://en.cppreference.com/w/cpp/17) compatible compiler (MSVC via Visual Studio, or MinGW-w64)
 
 ### Building
 
@@ -50,7 +50,7 @@ A lightweight 2D game engine built from scratch in C++ using SDL3, developed as 
 
 4. **Run**
    ```bash
-   ./<executable-name>.exe
+   ./Pong.exe
    ```
 
 > **Note:** Make sure SDL3 is installed and its path is correctly set in your environment or `CMakeLists.txt` before building.
@@ -70,9 +70,9 @@ my-engine/
 
 ## Roadmap
 
-- [ ] Audio system (SDL3 Mixer)
-- [ ] Entity Component System (ECS) architecture
-- [ ] Cross-platform support (Mac/Linux)
+- Audio system (SDL3 Mixer)
+- Entity Component System (ECS) architecture
+- Cross-platform support (Mac/Linux)
 
 ---
 
