@@ -6,11 +6,10 @@ package/
 *.o
 *.obj
 *.exe
-*.dll
 *.so
 *.a
 .vscode/
 CMakeCache.txt
-CmakeFiles/
+CMakeFiles/
 cmake_install.cmake
 Makefile

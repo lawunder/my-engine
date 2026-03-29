@@ -36,7 +36,17 @@ First player to 5 points wins. The ball increases in speed with each paddle hit.
 
 ## Getting Started
 
-### Prerequisites
+### Just want to play?
+ 
+Download the latest release, unzip, and double click `Pong.exe` — no setup required.
+
+[Download Pong (Windows)](https://github.com/lawunder/my-engine/releases/latest)
+ 
+---
+ 
+### Build from Source
+
+#### Prerequisites
 
 - Windows 10 or later
 - Install [MSYS2](https://www.msys2.org/), then open the **MSYS2 MinGW64** terminal and run:
@@ -45,7 +55,7 @@ First player to 5 points wins. The ball increases in speed with each paddle hit.
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-sdl3 mingw-w64-x86_64-sdl3-ttf
 ```
 
-### Building
+#### Building
 
 1. **Clone the repository**
    ```bash
